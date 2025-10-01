@@ -42,27 +42,29 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Run Model Training
+        id: training
         run: |
           pip install -r requirements/dev.txt
           python breast_cancer_app/model/train_model.py
+
+      - name: Build Docker Images
+        id: build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          # Construye las imágenes y las carga en el Docker local del runner
+          push: false
+          load: true
+          # Especifica los nombres de las imágenes para que docker-compose las encuentre
+          tags: |
+            breast_cancer_project-api:latest
+            breast_cancer_project-frontend:latest
+            breast_cancer_project-dev:latest
 
       - name: Run Integration Tests
         run: |
           docker compose up -d api
           docker compose run --rm tester
-
-      - name: Build Docker Images (no push)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          # Construye todas las etapas, pero no sube las imágenes
-          push: false
-          # Especificamos los targets para que se construyan
-          # y se almacenen en la caché local de la ejecución.
-          target: |
-            api
-            frontend
-
   # --- El job de despliegue está comentado por defecto ---
   # deploy:
   #   name: Deploy to Cloud Run
