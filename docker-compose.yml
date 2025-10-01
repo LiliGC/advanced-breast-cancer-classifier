@@ -1,0 +1,63 @@
+services:
+  training:
+    build:
+      context: .
+      # Target a una etapa que no existe para que use la imagen 'dev'
+      # que construiremos explícitamente.
+      target: dev
+    container_name: breast-cancer-training
+    command: python breast_cancer_app/model/train_model.py
+    volumes:
+      # Montamos el código para desarrollo, pero los artefactos van a un volumen nombrado.
+      - ./artifacts:/app/artifacts
+
+  api:
+    build:
+      context: .
+      target: api # Especifica que debe construir la etapa 'api' del Dockerfile
+    container_name: breast-cancer-api
+    command: waitress-serve --host 0.0.0.0 --port 5000 breast_cancer_app.api.api:app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./artifacts:/app/artifacts
+    depends_on:
+      training:
+        condition: service_completed_successfully
+    environment:
+      - FLASK_ENV=production
+    # No montamos el código fuente para simular mejor el entorno de producción.
+    # La imagen ya contiene el código necesario.
+
+  frontend:
+    build:
+      context: .
+      target: frontend # Especifica que debe construir la etapa 'frontend' del Dockerfile
+    container_name: breast-cancer-frontend
+    command: streamlit run breast_cancer_app/frontend/frontend.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./artifacts:/app/artifacts
+    depends_on:
+      - api
+    environment:
+      # Apuntar al servicio 'api' de Docker
+      - API_URL=http://api:5000
+    # No montamos el código fuente.
+
+  tester:
+    build:
+      context: .
+      # El tester necesita las dependencias de desarrollo.
+      target: dev
+    container_name: breast-cancer-tester
+    # Ejecuta el script de espera y luego las pruebas con pytest.
+    command: sh -c "chmod +x /app/tests/wait-for-api.sh && /app/tests/wait-for-api.sh && pytest -rA /app/tests"
+    depends_on:
+      - api
+    volumes:
+      - ./tests:/app/tests # Montamos solo los tests
+    environment:
+      # Apuntar a la API usando el nombre del servicio de Docker
+      - API_URL=http://api:5000

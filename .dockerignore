@@ -1,0 +1,25 @@
+# Excluir archivos de caché y bytecode de Python
+__pycache__/
+*.pyc
+*.log
+
+# Excluir artefactos generados, ya que se manejan con volúmenes
+artifacts/
+
+# Excluir configuraciones y caché de herramientas de desarrollo
+.vscode/
+.idea/
+
+# Excluir entornos virtuales de Python
+.venv/
+venv/
+env/
+
+# Excluir documentación y archivos de CI/CD
+.github/
+docs/
+README.md
+DEVELOPMENT_GUIDE.md # Si estuviera en la raíz
+
+# Excluir tests, ya que se montan como volumen para el servicio 'tester'
+tests/

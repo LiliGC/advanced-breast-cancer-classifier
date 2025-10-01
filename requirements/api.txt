@@ -1,0 +1,8 @@
+# requirements/api.txt - Dependencias para la API
+
+-r common.txt
+
+flask>=2.3.0
+flask-cors>=4.0.0
+waitress>=2.1.0
+gunicorn>=21.2.0

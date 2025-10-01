@@ -1,0 +1,30 @@
+# Entornos virtuales de Python
+.venv/
+venv/
+env/
+
+# Archivos de caché y compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos generados por el entrenamiento del modelo
+# Estos se crean al ejecutar el script y no deben ser versionados
+artifacts/
+
+# Archivos de log
+*.log
+
+# Configuraciones de IDE/Editor
+.vscode/
+.idea/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de distribución/build de Python
+dist/
+build/
+*.egg-info/
