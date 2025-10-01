@@ -48,8 +48,8 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          docker-compose up -d api
-          docker-compose run --rm tester
+          docker compose up -d api
+          docker compose run --rm tester
 
       - name: Build Docker Images (no push)
         uses: docker/build-push-action@v4
